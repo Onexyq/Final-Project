@@ -18,11 +18,9 @@ private:
 
 public:
 
-    Ball();
+    Ball(){}
 
     void init();
-
-    void update_ball();
 
     void incre_speed(double x);
 

@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1144</width>
-    <height>676</height>
+    <width>1091</width>
+    <height>692</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,11 +22,14 @@
   <widget class="QLCDNumber" name="lcdNumber">
    <property name="geometry">
     <rect>
-     <x>730</x>
+     <x>690</x>
      <y>60</y>
      <width>481</width>
      <height>51</height>
     </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
    </property>
    <property name="digitCount">
     <number>6</number>
@@ -35,8 +38,8 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>750</x>
-     <y>50</y>
+     <x>680</x>
+     <y>60</y>
      <width>151</width>
      <height>61</height>
     </rect>
@@ -49,8 +52,11 @@
      <bold>false</bold>
     </font>
    </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
    <property name="text">
-    <string>Score:</string>
+    <string>P1 Score:</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
@@ -73,6 +79,100 @@
    </property>
    <property name="text">
     <string>GameOver</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_mode">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>170</y>
+     <width>521</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ebrima</family>
+     <pointsize>24</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Welcome! Select your Game Mode:</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_single">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>320</y>
+     <width>311</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ebrima</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Single Player</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_double">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>380</y>
+     <width>311</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ebrima</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Two-Player</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>151</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ebrima</family>
+     <pointsize>26</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>P2 Score:</string>
+   </property>
+  </widget>
+  <widget class="QLCDNumber" name="lcdNumber_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>60</y>
+     <width>481</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="digitCount">
+    <number>6</number>
    </property>
   </widget>
   <widget class="QWidget" name="">

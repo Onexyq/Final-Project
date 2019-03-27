@@ -2,15 +2,6 @@
 #include<ctime>
 #include<QDebug>
 
-Ball::Ball(){
-
-}
-
-
-void Ball::update_ball()
-{
-
-}
 
 void Ball::incre_speed(double x)
 {
@@ -41,8 +32,6 @@ void Ball::destroy()
 {
 
 }
-
-
 
 
 EBall::EBall()

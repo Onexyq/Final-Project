@@ -1,7 +1,8 @@
 #include "widget.h"
 #include "ui_widget.h"
 #include <functional>
-#include<QDebug>
+#include <QFont>
+#include <QDebug>
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
@@ -22,19 +23,25 @@ Widget::Widget(QWidget *parent) :
 
     connect(movementTimer, SIGNAL(timeout()), this, SLOT(Player_Move()));
 
+    connect(movementTimer, SIGNAL(timeout()), this, SLOT(Player2_Move()));
+
     connect(movementTimer, SIGNAL(timeout()), this, SLOT(start_moving()));
 
     connect(repeatTimer, SIGNAL(timeout()), this, SLOT(change_direction()));
 
+
+    ui->label_2->setText("Game Over");
     ui->label_2->setVisible(false);
     ui->pushButton->setVisible(false);
     ui->pushButton_2->setVisible(false);
-    ui->label_2->setEnabled(false);
     ui->pushButton->setEnabled(false);
     ui->pushButton_2->setEnabled(false);
 
-    time_t t1, t2;
-    time(&t1);
+
+    ui->label_3->setVisible(false);
+    ui->label_3->setEnabled(false);
+    ui->lcdNumber_2->setVisible(false);
+    ui->lcdNumber_2->setEnabled(false);
 
     gameTimer->start(2); //2ms
     repeatTimer->start(500);  //0.5s
@@ -54,10 +61,18 @@ void Widget::paintEvent(QPaintEvent *)
     //Background
     p.drawPixmap(0,0,width(),height(),QPixmap("../InflatingBalls/Images/BG1.jpg"));
 
+    QFont Font1("Ebrima", player.radius ,true);
     p.setPen(QPen(Qt::blue, 3));
     p.drawEllipse(player.x, player.y, player.radius, player.radius);
+    p.drawText(player.x, player.y,"P1");
 
-
+    if(gamemode==2)
+    {
+        QFont Font1("Ebrima", player2.radius ,true);
+        p.setPen(QPen(Qt::red, 3));
+        p.drawEllipse(player2.x, player2.y, player2.radius, player2.radius);
+        p.drawText(player2.x, player2.y,"P2");
+    }
 
     for(auto it: Enemy_Balls)
     {
@@ -77,6 +92,7 @@ void Widget::keyPressEvent(QKeyEvent *e)
 
 void Widget::keyReleaseEvent(QKeyEvent *e)
 {
+    if(static_cast<Qt::Key>(e->key()));
     vector<Qt::Key>temp(pressedkeys.size());
     vector<Qt::Key>::iterator it = pressedkeys.begin();
     copy_if(pressedkeys.begin(),pressedkeys.end(),
@@ -94,6 +110,8 @@ void Widget::keyReleaseEvent(QKeyEvent *e)
      }
      return false;
  }
+
+
 
 void Widget::Player_Move()
 {
@@ -116,17 +134,49 @@ void Widget::Player_Move()
     }
 }
 
+void Widget::Player2_Move()
+{
+
+    if(is_pressing(Qt::Key_W))
+    {
+        player2.goUp();
+    }
+    if(is_pressing(Qt::Key_S))
+    {
+        player2.goDown();
+    }
+    if(is_pressing(Qt::Key_A))
+    {
+        player2.goLeft();
+    }
+    if(is_pressing(Qt::Key_D))
+    {
+        player2.goRight();
+    }
+}
+
+
 void Widget::init()
 {
-    ui->label_2->setVisible(false);
-    ui->pushButton->setVisible(false);
-    ui->pushButton_2->setVisible(false);
-    ui->label_2->setEnabled(false);
-    ui->pushButton->setEnabled(false);
-    ui->pushButton_2->setEnabled(false);
 
+    ui->label_mode->setVisible(false);
+    ui->pushButton_single->setVisible(false);
+    ui->pushButton_single->setEnabled(false);
+    ui->pushButton_double->setVisible(false);
+    ui->pushButton_double->setEnabled(false);
+
+    gameTimer->start();
+    score = 0;
+    ui->lcdNumber->display(score);
     player.init();
     Enemy_Balls.clear(); 
+
+    if(gamemode == 2)
+    {
+        score2 = 0;
+        ui->lcdNumber_2->display(score2);
+        player2.init();
+    }
 }
 
 void Widget::generate_balls()
@@ -169,51 +219,141 @@ void Widget::generate_balls()
  {
      if(Enemy_Balls.size()!=0)
      {
-         vector<EBall>::iterator it=Enemy_Balls.begin();
-         for (; it!=Enemy_Balls.end();it++) {
-             int x=(it->x+it->radius/2-player.x-player.radius/2);
-             int y=(it->y+it->radius/2-player.y-player.radius/2);
-             int d = sqrt(x*x+y*y);
+         if(gamemode==1){
+             vector<EBall>::iterator it=Enemy_Balls.begin();
+             for (; it!=Enemy_Balls.end();it++) {
+                 int x=(it->x+it->radius/2-player.x-player.radius/2);
+                 int y=(it->y+it->radius/2-player.y-player.radius/2);
+                 int d = sqrt(x*x+y*y);
 
-             if(d<=(player.radius/2-it->radius/2))
-             {
-                 player.incre_size(it->radius);
-                 score += (it->radius)*(it->radius)/10;
-                 ui->lcdNumber->display(score);
-                 it = Enemy_Balls.erase(it);
-             }
-             else if(d<=(it->radius/2-player.radius/2))
-             {
-
-                 player.radius=1;
-                 ui->label_2->setVisible(true);
-                 ui->pushButton->setVisible(true);
-                 ui->pushButton_2->setVisible(true);
-                 ui->label_2->setEnabled(true);
-                 ui->pushButton->setEnabled(true);
-                 ui->pushButton_2->setEnabled(true);
-
-             }
-         }
-         /**
-         vector<EBall>::iterator iter=Enemy_Balls.begin();
-         for (it=Enemy_Balls.begin(); it!=Enemy_Balls.end();it++) {
-             for (; iter!=Enemy_Balls.end();iter++)
-             {
-                 if(it!=iter){
-                     int x=(it->x+it->radius/2-iter->x-iter->radius/2);
-                     int y=(it->y+it->radius/2-iter->y-iter->radius/2);
-                     int d = sqrt(x*x+y*y);
-                      if(d<=(it->radius/2-iter->radius/2))
-                      {
-                         it->incre_size(iter->radius);
-                         iter = Enemy_Balls.erase(iter);
-                      }
+                 if(d<=(player.radius/2-it->radius/2))
+                 {
+                     QSound::play("../InflatingBalls/Sounds/eat.wav");
+                     player.incre_size(it->radius);
+                     score += (it->radius)*(it->radius)/10;
+                     ui->lcdNumber->display(score);
+                     it = Enemy_Balls.erase(it);
+                     if(player.radius>=700)
+                     {
+                         ui->label_2->setText("You Win! You are large enough! ");
+                         ui->label_2->setVisible(true);
+                         ui->pushButton->setVisible(true);
+                         ui->pushButton_2->setVisible(true);
+                         ui->pushButton->setEnabled(true);
+                         ui->pushButton_2->setEnabled(true);
+                     }
                  }
+                 else if(d<=(it->radius/2-player.radius/2))
+                 {
 
+                     player.radius = 1;
+                     ui->label_2->setText("Game Over");
+                     ui->label_2->setVisible(true);
+                     ui->pushButton->setVisible(true);
+                     ui->pushButton_2->setVisible(true);
+                     ui->pushButton->setEnabled(true);
+                     ui->pushButton_2->setEnabled(true);
+
+                 }
              }
          }
-         */
+
+         else if(gamemode==2)
+         {
+             vector<EBall>::iterator it=Enemy_Balls.begin();
+             for (; it!=Enemy_Balls.end();it++) {
+                 int x=(it->x+it->radius/2-player.x-player.radius/2);
+                 int y=(it->y+it->radius/2-player.y-player.radius/2);
+                 int d = sqrt(x*x+y*y);
+
+                 if(d<=(player.radius/2-it->radius/2))
+                 {
+                     QSound::play("../InflatingBalls/Sounds/eat.wav");
+                     player.incre_size(it->radius);
+                     score += (it->radius)*(it->radius)/10;
+                     ui->lcdNumber->display(score);
+                     it = Enemy_Balls.erase(it);
+                 }
+                 else if(d<=(it->radius/2-player.radius/2))
+                 {
+
+                     player.radius = 1;
+                     ui->label_2->setText("Player2 Win");
+                     ui->label_2->setVisible(true);
+                     ui->pushButton->setVisible(true);
+                     ui->pushButton_2->setVisible(true);
+                     ui->pushButton->setEnabled(true);
+                     ui->pushButton_2->setEnabled(true);
+
+                 }
+             }
+             for (it=Enemy_Balls.begin(); it!=Enemy_Balls.end();it++) {
+                 int x=(it->x+it->radius/2-player2.x-player2.radius/2);
+                 int y=(it->y+it->radius/2-player2.y-player2.radius/2);
+                 int d = sqrt(x*x+y*y);
+
+                 if(d<=(player2.radius/2-it->radius/2))
+                 {
+                     QSound::play("../InflatingBalls/Sounds/eat.wav");
+                     player2.incre_size(it->radius);
+                     score2 += (it->radius)*(it->radius)/10;
+                     ui->lcdNumber_2->display(score2);
+                     it = Enemy_Balls.erase(it);
+                 }
+                 else if(d<=(it->radius/2-player.radius/2))
+                 {
+
+                     player2.radius = 1;
+                     ui->label_2->setText("Player1 Win");
+                     ui->label_2->setVisible(true);
+                     ui->label_2->setEnabled(true);
+                     ui->pushButton->setVisible(true);
+                     ui->pushButton_2->setVisible(true);
+                     ui->pushButton->setEnabled(true);
+                     ui->pushButton_2->setEnabled(true);
+
+                 }
+             }
+
+             int x=(player.x+player.radius/2-player2.x-player2.radius/2);
+             int y=(player.y+player.radius/2-player2.y-player2.radius/2);
+             int d = sqrt(x*x+y*y);
+             if(d<player.radius/2-player2.radius/2)
+             {
+                    QSound::play("../InflatingBalls/Sounds/eat.wav");
+                    player2.radius = 1;
+                    player.incre_size(player2.radius);
+                    ui->label_2->setText("Player1 Win! ");
+                    ui->label_2->setVisible(true);
+                    ui->label_2->setEnabled(true);
+                    ui->pushButton->setVisible(true);
+                    ui->pushButton_2->setVisible(true);
+                    ui->pushButton->setEnabled(true);
+                    ui->pushButton_2->setEnabled(true);
+                    gameTimer->stop();
+
+             }
+             else if(d<player2.radius/2-player.radius/2)
+             {
+
+                    QSound::play("../InflatingBalls/Sounds/eat.wav");
+                    player.radius = 1;
+                    player2.incre_size(player.radius);
+                    ui->label_2->setText("Player2 Win! ");
+                    ui->label_2->setVisible(true);
+                    ui->label_2->setEnabled(true);
+                    ui->pushButton->setVisible(true);
+                    ui->pushButton_2->setVisible(true);
+                    ui->pushButton->setEnabled(true);
+                    ui->pushButton_2->setEnabled(true);
+                    gameTimer->stop();
+
+             }
+
+         }
+
+
+
      }
  }
 
@@ -222,10 +362,49 @@ void Widget::generate_balls()
 
 void Widget::on_pushButton_clicked()
 {
-    init();
+    gameTimer->stop();
+
+    ui->label_2->setVisible(false);
+    ui->pushButton->setVisible(false);
+    ui->pushButton_2->setVisible(false);
+    ui->label_2->setEnabled(false);
+    ui->pushButton->setEnabled(false);
+    ui->pushButton_2->setEnabled(false);
+
+
+    ui->label_mode->setVisible(true);
+    ui->pushButton_single->setVisible(true);
+    ui->pushButton_single->setEnabled(true);
+    ui->pushButton_double->setVisible(true);
+    ui->pushButton_double->setEnabled(true);
 }
 
 void Widget::on_pushButton_2_clicked()
 {
     this->close();
+}
+
+void Widget::on_pushButton_single_clicked()
+{
+    gamemode = 1;
+
+    ui->lcdNumber_2->setVisible(false);
+    ui->lcdNumber_2->setEnabled(false);
+    ui->label_3->setVisible(false);
+    ui->label_3->setEnabled(false);
+
+    init();
+}
+
+void Widget::on_pushButton_double_clicked()
+{
+    gamemode = 2;
+
+    ui->label_3->setVisible(true);
+    ui->label_3->setEnabled(true);
+    ui->lcdNumber_2->setVisible(true);
+    ui->lcdNumber_2->setEnabled(true);
+    init();
+    player2.x=player.x-100;
+
 }

@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QTime>
 #include "ball.h"
+#include <QSound>
 
 namespace Ui {
 class Widget;
@@ -36,6 +37,8 @@ protected:
 private slots:
     void Player_Move();
 
+    void Player2_Move();
+
     void generate_balls();
 
     void start_moving();
@@ -48,6 +51,10 @@ private slots:
 
     void on_pushButton_2_clicked();
 
+    void on_pushButton_single_clicked();
+
+    void on_pushButton_double_clicked();
+
 private:
     Ui::Widget *ui;
 
@@ -59,7 +66,11 @@ private:
 
     Ball player;
 
-    bool Gamestart;
+    Ball player2;
+
+    QString dir;
+
+    int gamemode;   //single=1 , two-player=2, etc
 
     bool is_pressing(Qt::Key k);
 
@@ -68,6 +79,8 @@ private:
     vector<EBall>Enemy_Balls;
 
     int score = 0;
+
+    int score2 = 0;
 
 };
 
